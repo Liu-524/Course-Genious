@@ -242,12 +242,12 @@
         var abbr =  $('#find_course').val().match(/[a-zA-Z]+/g);
         if (integer < 100 && integer > 10) {
             integer = integer * 10;
-            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\''
         } else if (integer < 10 && integer >= 0) {
             integer = integer * 100
-            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\''
         } else {
-        var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\''
         
         }
         axios.post(url + '/searchres', {
