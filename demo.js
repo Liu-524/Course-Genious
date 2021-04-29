@@ -60,7 +60,15 @@ app.post("/serverlet", function(req, res) {
         console.log(data.rating == 1)
         res.send("OK")
     } else if (req.body.action === 'signin') {
-        
+        var query_str = "SELECT * FROM User WHERE email = '" + req.body.username + "' LIMIT 1"
+        sql_con.query(query_str, function (error, results, fields) {
+            if (error) throw error;
+            console.log('The solution is: ' + results.length);
+            if (result.length == 1) {
+                res.send({result : 0})
+                res.end()
+            }
+        });
     }
 })
 

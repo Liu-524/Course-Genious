@@ -248,7 +248,6 @@
             var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\''
         } else {
         var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\''
-        
         }
         axios.post(url + '/searchres', {
             command : tempCmd
