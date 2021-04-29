@@ -210,6 +210,29 @@
     }
     function search() {
         alert($('#find_course').val());
+        
+        var url = this.window.document.location.origin;
+        var integer = $('#find_course').val().match(/\d+/g);
+        var abbr =  $('#find_course').val().match(/[a-zA-Z]+/g);
+        if (integer < 100 && integer > 10) {
+            integer = integer * 10;
+            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        } 
+        if (integer < 10 && integer >= 0) {
+            integer = integer * 100
+            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        } else {
+
+        var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        }
+        axios.post(url + '/searchres', {
+            command : tempCmd
+        }).then(function(res) { //success
+            console.log(res.data);
+            vue.query_result = res.data
+        }).catch(function(err){ //F*
+            console.log(err);
+        });
     }
     $("#write-comment").submit(function() {
         var data = JSON.stringify($('#write-comment').serializeArray())
