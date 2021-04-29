@@ -62,6 +62,16 @@ app.post("/serverlet", function(req, res) {
     }
 })
 
+app.post('/searchres', function (req, res) {
+    var tempD = req.body
+    console.log('req body: ', tempD);
+    sql_con.query(tempD.command, function (error, results, fields) {
+        if (error) throw error;
+        console.log('The solution is: ', results);
+        res.send(results); 
+      });
+ })
+
 http.listen(8080,function(){
     console.log('listening on *:8080');
 });

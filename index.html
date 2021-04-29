@@ -27,7 +27,7 @@
                 <li class="active"><a href="#main">Course</a></li>
                 <li><a href="#user">User</a></li>
             </ul>
-            <form v-if='user===""' class="navbar-form navbar-right">
+            <form v-if='user===""' class="navbar-form navbar-right" onsubmit="return false">
                 <div class="form-group" id='login_form'>
                   <input type="text" class="form-control" placeholder="Email" id='user_email'>
                   <input type="text" class="form-control" placeholder="Password" id='user_pwd'>
@@ -43,7 +43,7 @@
     <div class='container-fluid'>
         <div class='row'>
             <div class='col-lg-2'>
-                <div class="row"><form class='form-inline'>
+                <div class="row"><form class='form-inline' onsubmit="return false">
                 <div class='form-group'>
                     <input type="text" class="form-control" placeholder="CS411" id='find_course'>
                 </div>
@@ -209,8 +209,7 @@
         })
     }
     function search() {
-        alert($('#find_course').val());
-        
+        //alert($('#find_course').val());
         var url = this.window.document.location.origin;
         var integer = $('#find_course').val().match(/\d+/g);
         var abbr =  $('#find_course').val().match(/[a-zA-Z]+/g);
@@ -229,7 +228,7 @@
             command : tempCmd
         }).then(function(res) { //success
             console.log(res.data);
-            vue.query_result = res.data
+            vue.course_list = res.data
         }).catch(function(err){ //F*
             console.log(err);
         });

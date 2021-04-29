@@ -14,8 +14,8 @@ var tempD;
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '',
-  database : 'sys'
+  password : '123456',
+  database : 's3'
 });
 
 app.post("/serverlet", function(req, res) {
@@ -77,7 +77,7 @@ app.post('/searchres', function (req, res) {
  app.get('/searchres', function (req, res) {
     console.log('req body: ', tempD);
     
-    connection.query(tempD.command, function (error, results, fields) {
+    sql_con.query(tempD.command, function (error, results, fields) {
         if (error) throw error;
         console.log('The solution is: ', results);
         res.send(results); 
