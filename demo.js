@@ -59,6 +59,8 @@ app.post("/serverlet", function(req, res) {
         data = JSON.parse(data)
         console.log(data.rating == 1)
         res.send("OK")
+    } else if (req.body.action === 'signin') {
+        
     }
 })
 
