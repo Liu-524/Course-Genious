@@ -10,6 +10,7 @@ var fs = require('fs');
 
 var mysql = require('mysql');
 var bodyParser = require('body-parser');
+const { response } = require('express');
 var tempD;
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -20,7 +21,7 @@ var connection = mysql.createConnection({
 
 app.get('/search/', function (req, res) {
     //res.send('Hello World33');
-        res.sendFile('/Users/lucas/OneDrive/UIUC/CS 411/stage5/express/bs.html');
+        res.sendFile('/Users/lucas/OneDrive/UIUC/CS 411/cs411-t7/index.html');
        
 
  })
@@ -40,17 +41,12 @@ app.post('/search/', function (req, res) {
 app.use(bodyParser.json());
 
 //app.use(bodyParser.text());
-app.post('/searchres', function (req, res) {
-    tempD = req.body;
 
-    console.log('req body in POST: ', req.body);
 
- })
-
- app.get('/searchres', function (req, res) {
-    console.log('req body: ', tempD);
+ app.post('/searchres', function (req, res) {
+    console.log('req body: ', req.body);
     
-    connection.query(tempD.command, function (error, results, fields) {
+    connection.query(req.body.command, function (error, results, fields) {
         if (error) throw error;
         console.log('The solution is: ', results);
         res.send(results); 
@@ -62,7 +58,7 @@ app.post('/searchres', function (req, res) {
 
 
     
-var server = app.listen(8084, function () {
+var server = app.listen(8085, function () {
  
   var host = server.address().address
   var port = server.address().port

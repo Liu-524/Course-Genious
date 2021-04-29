@@ -65,7 +65,6 @@
                     <p class='text-justify'>{{course_data.description}}</p>
                 </div>
                 <div class='row'>
-                    
                     <ul id="myTab" class="nav nav-tabs">
                         <li class="active"><a href="#home" data-toggle="tab">Comments</a></li>
                         <li><a href="#workload" data-toggle="tab">Assignments</a></li>
@@ -93,20 +92,57 @@
                                 </ul>
                         </div>
                         <div class="tab-pane fade" id="write">
-                            under construction...
+                            <div class="container-fluid">
+                            <div class='row'>
+                                <h4>Write a comment</h4>
+                                <form id='write-comment' onsubmit="return false">
+                                    <label for='write-rating'>Rating</label>
+                                    <div class='form-group'><input name='rating' type='number' min='1' max='5' required="required" id='write-rating'></div>
+                                    <label for='write-grade'>Grade</label>
+                                    <div class='form-group'><input name='grade' type='text' required="required" id='write-grade'></div>
+                                    <label for='write-content'>Comment</label>
+                                    <div class='form-group'><input class='form-control' name='content' type='text' required="required" id='write-content'></div>
+                                    <div class='form-group'><input type='submit' class='btn-primary' value='submit'></div>
+                                </form>
+                            </div>
+                            <div class='row'>
+                                <h4>Describe an assignment</h4>
+                                <form id='write-assignment' onsubmit="false">
+                                    <label for='asmtfrom-type'>Type</label>
+                                    <div class='form-group'>
+                                        <label class='radio-inline'><input name='type' type='radio' required="required" value='daily'>daily</label>
+                                        <label class='radio-inline'><input name='type' type='radio' required="required" value='weekly'>weekly</label>
+                                        <label class='radio-inline'><input name='type' type='radio' required="required" value='multi-weekly'>multi-weekly</label>
+                                        <label class='radio-inline'><input name='type' type='radio' required="required" value='part-of-semester'>part-of-semester</label>
+                                        <label class='radio-inline'><input name='type' type='radio' required="required" value='semester-long'>semester-long</label>
+                                    </div>
+                                    <label for='asmtfrom-grading'>Grading</label>
+                                    <div class='form-group'>
+                                        <label class='radio-inline'><input name='grade' type='radio' required="required" value='single'>single attempt</label>
+                                        <label class='radio-inline'><input name='grade' type='radio' required="required" value='multi'>multiple attempts</label>
+                                    </div>
+                                    <label for='asmtform-workload'>Workload</label>
+                                    <div class='form-group'>
+                                        <label class='radio-inline'><input name='workload' type='radio' required="required" value='light'>light</label>
+                                        <label class='radio-inline'><input name='workload' type='radio' required="required" value='medium'>medium</label>
+                                        <label class='radio-inline'><input name='workload' type='radio' required="required" value='heavy'>heavy</label>
+                                    </div>
+                                    <label for='asmtform-content'>Comment</label>
+                                    <div class='form-group'><input class='form-control' name='content' type='text' required="required" id='write-content'></div>
+                                    <div class='form-group'><input type='submit' class='btn-primary' value='submit'></div>
+                                </form>
+                            </div>
+                        </div>
                         </div>
                     </div>                        
                 </div>
             </div>
             </div>
-
         </div>
     </div>
 </div>
 </body>
 </html>
-
-// implementation of search function
 
 <script>
     var url = this.window.document.location.origin;
@@ -158,13 +194,21 @@
     });
 
     function login() {
-        var form_data = $('#user_email').val()
-        console.log(form_data);
-        vue.user = form_data;
+        var uemail = $('#user_email').val()
+        var upwd = $('#user_pwd').val()
+        axios.post(url + '/serverlet', {
+            action : "login",
+            username : uemail,
+            pwd : upwd
+        }).then(function(res) {
+            console.log(res)
+            if (res.data.result == 1) vue.user = uemail
+            else alert("wrong email or password")
+        }).catch(function(err){
+            console.log(err);
+        })
     }
     
-    // implementation of search function
-    // send course_data Jsonarray to node searchres
     function search() {
         alert($('#find_course').val());
         
@@ -174,24 +218,41 @@
         if (integer < 100 && integer > 10) {
             integer = integer * 10;
             var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
-        } 
-        if (integer < 10 && integer >= 0) {
+        } else if (integer < 10 && integer >= 0) {
             integer = integer * 100
             var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
         } else {
-
         var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        
         }
         axios.post(url + '/searchres', {
             command : tempCmd
         }).then(function(res) { //success
             console.log(res.data);
             vue.query_result = res.data
+            vue.data.course_list = res
         }).catch(function(err){ //F*
             console.log(err);
         });
-    
     }
+
+    $("#write-comment").submit(function() {
+        var data = JSON.stringify($('#write-comment').serializeArray())
+        alert(data);
+        axios.post(url + '/serverlet', {
+            action : "post-comment",
+            data : data
+        }).then(function(res) {
+            console.log(res)
+        }).catch(function(err){
+            console.log(err);
+        })
+    });
+    $("#write-assignment").submit(function() {
+        var data = $('#write-assignment').serialize()
+        alert(data);
+        this.window.location = url
+    });
     $('tr').click(function() {
         alert(event.srcElement.id);
     });
