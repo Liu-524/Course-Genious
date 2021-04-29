@@ -15,22 +15,10 @@ var tempD;
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '123456',
-  database : 's3'
+  password : '',
+  database : 'sys'
 });
 
-app.post("/serverlet", function(req, res) {
-  console.log(req.body);
-  if (req.body.action === 'login') {
-      res.send({result : 1, 
-          content : {}
-      });
-  } else if (req.body.action === 'post-comment') {
-      var data = JSON.parse(req.body.data);
-      
-      res.send("OK")
-  }
-})
 
 app.get('/search/', function (req, res) {
     //res.send('Hello World33');
@@ -75,11 +63,7 @@ app.use(bodyParser.json());
  app.post('/searchres', function (req, res) {
     console.log('req body: ', req.body);
     
-<<<<<<< HEAD
-    sql_con.query(tempD.command, function (error, results, fields) {
-=======
     connection.query(req.body.command, function (error, results, fields) {
->>>>>>> 09fc9715bd4075d0ca20ce695dcd8b494e0b9e6a
         if (error) throw error;
         console.log('The solution is: ', results);
         res.send(results); 
