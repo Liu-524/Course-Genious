@@ -49,8 +49,25 @@ app.post("/database",function(req, res) {
 app.post("/serverlet", function(req, res) {
     console.log(req.body);
     if (req.body.action === 'login') {
-        res.send({result : 1, 
-            content : {}
+        var uemail = req.body.username
+        var pwd = req.body.pwd
+        var query_str = "SELECT * FROM User WHERE email = '" + req.body.username + "' LIMIT 1"
+        sql_con.query(query_str, function (error, results, fields) {
+            if (error) {
+                res.send({result:0});
+                res.end();
+                return;
+            }
+            if (results.length == 0) {
+                res.send({result:0});
+                res.end();
+                return;
+            } else {
+                console.log(results[0])
+                res.send({result:1, 
+                    uid: results[0].uid
+                })
+            }
         });
     } else if (req.body.action === 'post-comment') {
         var data = req.body.data.replace(new RegExp('&',"gm"),'", "')
@@ -60,15 +77,33 @@ app.post("/serverlet", function(req, res) {
         console.log(data.rating == 1)
         res.send("OK")
     } else if (req.body.action === 'signin') {
+        var colli = false
         var query_str = "SELECT * FROM User WHERE email = '" + req.body.username + "' LIMIT 1"
         sql_con.query(query_str, function (error, results, fields) {
             if (error) throw error;
             console.log('The solution is: ' + results.length);
-            if (result.length == 1) {
+            if (results.length == 1) {
                 res.send({result : 0})
                 res.end()
+            } else {
+                query_str = "INSERT INTO User(email, pwd, uname) VAlUES('" + req.body.username + "', '" + req.body.pwd + "', '" + req.body.name + "')"
+                console.log(query_str)
+                sql_con.query(query_str, function(err, results) {
+                    if (err) {
+                        console.log(err)
+                        res.send({result : 0,
+                            message : "database error!"
+                        })
+                        res.end()
+                    } else {
+                        res.send({result : 1})
+                        res.end()
+                    }
+                });
             }
         });
+            
+        
     }
 })
 

@@ -31,6 +31,7 @@
                 <div class="form-group" id='login_form'>
                   <input type="text" class="form-control" placeholder="Email" id='user_email'>
                   <input type="text" class="form-control" placeholder="Password" id='user_pwd'>
+                  <input type="text" class="form-control" placeholder="Name" id='user_name'>
                 </div>
                 <button class="btn btn-default" onclick="login()">Login</button>
                 <button class="btn btn-default" onclick="signin()">Sign in</button>
@@ -198,15 +199,16 @@
     function signin() {
         var uemail = $('#user_email').val()
         var upwd = $('#user_pwd').val()
+        var uname = $('#user_name').val()
         axios.post(url + '/serverlet', {
             action : "signin",
             username : uemail,
+            name : uname,
             pwd : upwd
         }).then(function(res) {
             console.log(res)
             if (res.data.result == 1) {
-                vue.user = uemail
-                vue.uid = res.data.uid
+                alert("success")
             } else {
                 alert("email occupied")
             }
