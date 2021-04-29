@@ -152,7 +152,7 @@
         course_list: [
             {cid: 1, course_num: 411, abbr: 'CS'},
             {cid: 2, course_num: 440, abbr: 'CS'},
-            {cid: 3, course_num: 241, abbr: 'CS'}
+            {cid: 3, course_num: 242, abbr: 'CS'}
         ],
         course_data:{
             cid: 1, 
@@ -208,6 +208,7 @@
             console.log(err);
         })
     }
+
     function search() {
         //alert($('#find_course').val());
         var url = this.window.document.location.origin;
@@ -216,13 +217,12 @@
         if (integer < 100 && integer > 10) {
             integer = integer * 10;
             var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
-        } 
-        if (integer < 10 && integer >= 0) {
+        } else if (integer < 10 && integer >= 0) {
             integer = integer * 100
             var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
         } else {
-
         var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        
         }
         axios.post(url + '/searchres', {
             command : tempCmd
@@ -233,6 +233,7 @@
             console.log(err);
         });
     }
+
     $("#write-comment").submit(function() {
         var data = JSON.stringify($('#write-comment').serializeArray())
         alert(data);
