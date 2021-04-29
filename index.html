@@ -95,19 +95,19 @@
                             <div class="container-fluid">
                             <div class='row'>
                                 <h4>Write a comment</h4>
-                                <form id='write-comment'>
+                                <form id='write-comment' onsubmit="return false">
                                     <label for='write-rating'>Rating</label>
                                     <div class='form-group'><input name='rating' type='number' min='1' max='5' required="required" id='write-rating'></div>
                                     <label for='write-grade'>Grade</label>
                                     <div class='form-group'><input name='grade' type='text' required="required" id='write-grade'></div>
                                     <label for='write-content'>Comment</label>
                                     <div class='form-group'><input class='form-control' name='content' type='text' required="required" id='write-content'></div>
-                                    <div class='form-group'><input type='submit' class='btn-primary' value='submit' onclick="postComment()"></div>
+                                    <div class='form-group'><input type='submit' class='btn-primary' value='submit'></div>
                                 </form>
                             </div>
                             <div class='row'>
                                 <h4>Describe an assignment</h4>
-                                <form id='write-assignment'>
+                                <form id='write-assignment' onsubmit="false">
                                     <label for='asmtfrom-type'>Type</label>
                                     <div class='form-group'>
                                         <label class='radio-inline'><input name='type' type='radio' required="required" value='daily'>daily</label>
@@ -138,7 +138,6 @@
                 </div>
             </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -195,20 +194,39 @@
     });
 
     function login() {
-        var form_data = $('#user_email').val()
-        console.log(form_data);
-        vue.user = form_data;
+        var uemail = $('#user_email').val()
+        var upwd = $('#user_pwd').val()
+        axios.post(url + '/serverlet', {
+            action : "login",
+            username : uemail,
+            pwd : upwd
+        }).then(function(res) {
+            console.log(res)
+            if (res.data.result == 1) vue.user = uemail
+            else alert("wrong email or password")
+        }).catch(function(err){
+            console.log(err);
+        })
     }
     function search() {
         alert($('#find_course').val());
     }
     $("#write-comment").submit(function() {
-        var data = $('#write-comment').serialize()
+        var data = JSON.stringify($('#write-comment').serializeArray())
         alert(data);
+        axios.post(url + '/serverlet', {
+            action : "post-comment",
+            data : data
+        }).then(function(res) {
+            console.log(res)
+        }).catch(function(err){
+            console.log(err);
+        })
     });
     $("#write-assignment").submit(function() {
         var data = $('#write-assignment').serialize()
         alert(data);
+        this.window.location = url
     });
     $('tr').click(function() {
         alert(event.srcElement.id);
