@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>  
+    <script src ='https://cdn.staticfile.org/axios/0.21.1/axios.js'></script>
+    <script src="https://cdn.staticfile.org/vue/2.6.9/vue.js"></script>
+    <style type = "text/css">
+        ul#comment-view li {background-color: #FFFFFF}
+        ul#comment-view li:nth-child(2n+1){background-color: #EEEEEE}
+        ul.nav li:hover {background-color: #EEEEFF;}
+    </style>
+</head>
+<body>
+<div id='app'>
+    <nav class="navbar navbar-default" role='navigation'>
+    <div class='container-fluid'>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nvb-clpse-1" aria-expanded="false">nav</button>
+            <a class="navbar-brand" href="#">Course Genius</a>
+        </div>
+        <div class="navbar-collapse collapse" id='nvb-clpse-1'>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#main">Course</a></li>
+                <li><a href="#user">User</a></li>
+            </ul>
+            <form v-if='user===""' class="navbar-form navbar-right">
+                <div class="form-group" id='login_form'>
+                  <input type="text" class="form-control" placeholder="Email" id='user_email'>
+                  <input type="text" class="form-control" placeholder="Password" id='user_pwd'>
+                </div>
+                <button type="submit" class="btn btn-default" onclick="login()">Submit</button>
+            </form>
+            <div v-else class='navbar-right'>
+                Welcome {{user}}!
+            </div>
+        </div>
+    </div>
+    </nav>
+    <div class='container-fluid'>
+        <div class='row'>
+            <div class='col-lg-2'>
+                <div class="row"><form class='form-inline'>
+                <div class='form-group'>
+                    <input type="text" class="form-control" placeholder="CS411" id='find_course'>
+                </div>
+                <button type="submit" clas='btn-primary' onclick='search()'>Search</button>
+                </form></div>
+                <div class='row'>
+                    <ul class='nav nav-list pre-scrollable'>
+                        <li v-for='course in course_list' :key='course.cid' :id='forId(course.cid)'>
+                        {{course.abbr}}{{course.course_num}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class ='col-lg-10'>
+                <div class="container-fluid">
+                <div class='row'>
+                    <h2>{{course_data.abbr}}{{course_data.course_num}}</h2>
+                    <h4>Average Rating: {{course_data.avg_rating}}</h4>
+                    <p class='text-justify'>{{course_data.description}}</p>
+                </div>
+                <div class='row'>
+                    
+                    <ul id="myTab" class="nav nav-tabs">
+                        <li class="active"><a href="#home" data-toggle="tab">Comments</a></li>
+                        <li><a href="#workload" data-toggle="tab">Assignments</a></li>
+                        <li><a href="#write" data-toggle="tab">Contribute</a></li>
+                    </ul>
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <ul class='list-unstyled pre-scrollable' id='comment-view'>
+                            <li v-for='comment in course_data.featured'>
+                                <h4>{{comment.uname}} says:</h4>
+                                <p>rating: {{comment.rating}}</p>
+                                <p class='text-justify'>{{comment.content}}</p>
+                            <li>
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade" id="workload">
+                            <ul class='list-unstyled pre-scrollable' id='assignment-view'>
+                                <li v-for='asmt in course_data.assignments'>
+                                    <h4>Contributed by {{asmt.uname}},</h4>
+                                    <p> type: {{asmt.type}}</p> 
+                                    <p :class='asmtGetClass(asmt.grading)'> grading: {{asmt.grading}}</p>
+                                    <p :class='asmtGetClass(asmt.load)'> workload: {{asmt.load}}</p>
+                                    <p class='text-justify'>{{asmt.content}}</p>
+                                <li>
+                                </ul>
+                        </div>
+                        <div class="tab-pane fade" id="write">
+                            under construction...
+                        </div>
+                    </div>                        
+                </div>
+            </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+// implementation of search function
+
+<script>
+    var url = this.window.document.location.origin;
+    var vue = new Vue({
+    el: '#app',
+    data : {
+        course_list: [
+            {cid: 1, course_num: 411, abbr: 'CS'},
+            {cid: 2, course_num: 440, abbr: 'CS'},
+            {cid: 3, course_num: 241, abbr: 'CS'}
+        ],
+        course_data:{
+            cid: 1, 
+            course_num:411, 
+            abbr:'CS', 
+            description: 'THIS IS TEST DESCIPTION...',
+            avg_rating : 4.9,
+            featured : [{uname: 'Bohan', content: 'Great course!', rating:5},
+                        {uname: 'Alex', content: 'Good course!', rating:4},
+                        {uname: 'Bohan', content: 'Great course!', rating:5},
+                        {uname: 'Bohan', content: 'Great course!', rating:5},
+                        {uname: 'Bohan', content: 'Great course!', rating:5},
+                        {uname: 'Bohan', content: 'Great course!', rating:5},
+                        {uname: 'Bohan', content: 'Great course!', rating:5},
+                        {uname: 'Bohan', content: 'Great course!', rating:5},
+                        {uname: 'Bohan', content: 'Great course!', rating:5}
+                        ],
+            assignments : [ {uname:'Frill', type: 'weekly', grading:'multi', load: 'light', content : "Weekly prelectures and group assesments!"},
+                            {uname:'Stu233', type: 'multi-weekly', grading:'single', load: 'medium', content : "3 infinite try coding homework and 3 single try written homework."},
+                            {uname:'>_<', type: 'part-of-semester', grading:'single', load: 'medium', content : "2 exams with one page cheatsheet."},
+                            {uname:'Agent Smith', type: 'semester-long', grading:'single', load: 'heavy', content : 'semester long group project which takes lots of time..'},
+
+            ],
+        },
+        user : ""
+    },
+    methods : {
+        forId(x) {
+            return x + ";course_page";
+        },
+        asmtGetClass(s) {
+            if (s === 'multi') return 'text-success'
+            if (s === 'single') return 'text-danger'
+            if (s === 'light') return 'text-success'
+            if (s === 'medium') return 'text-primary'
+            if (s === 'heavy') return 'text-danger'
+        }
+    }
+    });
+
+    function login() {
+        var form_data = $('#user_email').val()
+        console.log(form_data);
+        vue.user = form_data;
+    }
+    
+    // implementation of search function
+    // send course_data Jsonarray to node searchres
+    function search() {
+        alert($('#find_course').val());
+        
+        var url = this.window.document.location.origin;
+        var integer = $('#find_course').val().match(/\d+/g);
+        var abbr =  $('#find_course').val().match(/[a-zA-Z]+/g);
+        if (integer < 100 && integer > 10) {
+            integer = integer * 10;
+            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        } 
+        if (integer < 10 && integer >= 0) {
+            integer = integer * 100
+            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        } else {
+
+        var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+        }
+        axios.post(url + '/searchres', {
+            command : tempCmd
+        }).then(function(res) { //success
+            console.log(res.data);
+            vue.query_result = res.data
+        }).catch(function(err){ //F*
+            console.log(err);
+        });
+    
+    }
+    $('tr').click(function() {
+        alert(event.srcElement.id);
+    });
+    $('[id$="course_page"]').click(function() {
+        var id = event.srcElement.id;
+        alert(id);
+    })
+    
+</script>
