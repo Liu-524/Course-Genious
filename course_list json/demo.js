@@ -18,11 +18,22 @@ var connection = mysql.createConnection({
   database : 'sys'
 });
 
+app.post("/serverlet", function(req, res) {
+  console.log(req.body);
+  if (req.body.action === 'login') {
+      res.send({result : 1, 
+          content : {}
+      });
+  } else if (req.body.action === 'post-comment') {
+      var data = JSON.parse(req.body.data);
+      
+      res.send("OK")
+  }
+})
+
 app.get('/search/', function (req, res) {
     //res.send('Hello World33');
         res.sendFile('/Users/lucas/OneDrive/UIUC/CS 411/stage5/express/bs.html');
-       
-
  })
 
 app.post('/search/', function (req, res) {
@@ -34,6 +45,22 @@ app.post('/search/', function (req, res) {
         res.send(results);
       });
 
+})
+
+app.post("/serverlet", function(req, res) {
+  console.log(req.body);
+  if (req.body.action === 'login') {
+      res.send({result : 1, 
+          content : {}
+      });
+  } else if (req.body.action === 'post-comment') {
+      var data = req.body.data.replace(new RegExp('&',"gm"),'", "')
+      data = data.replace(new RegExp('=',"gm"), '":"')
+      data = '{"' + data + '"}'
+      data = JSON.parse(data)
+      console.log(data.rating == 1)
+      res.send("OK")
+  }
 })
 
 
@@ -55,11 +82,7 @@ app.post('/searchres', function (req, res) {
         console.log('The solution is: ', results);
         res.send(results); 
       });
-
  })
- 
-
-
 
     
 var server = app.listen(8084, function () {
