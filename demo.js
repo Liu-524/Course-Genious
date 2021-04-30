@@ -1,7 +1,7 @@
 var app = require('express')();
 var qs = require('querystring');
 var bodyParser = require('body-parser');
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG, O_NONBLOCK } = require('constants');
 var cookieParser = require('cookie-parser');
 const { pid, allowedNodeEnvironmentFlags } = require('process');
 var http = require('http').Server(app);
@@ -63,19 +63,26 @@ app.post("/serverlet", function(req, res) {
                 return;
             } else {
                 console.log(results[0])
-                res.send({result:1, 
-                    uid: results[0].uid
-                })
+                if (req.body.pwd === results[0].pwd) {
+                    res.send({result:1, 
+                        uid: results[0].uid
+                    })
+                } else {
+                    res.send({result:0});
+                    res.end();
+                    return;
+                }
             }
         });
     } else if (req.body.action === 'post-comment') {
         var data = req.body.data.replace(new RegExp('&',"gm"),'", "')
         data = data.replace(new RegExp('=',"gm"), '":"')
-        data = '{' + data + '}'
+        data = data.replace(new RegExp('%2B',"gm"), '+')
+        data = '{"' + data + '"}'
         console.log(data)
         data = JSON.parse(data)
         var query_str = "INSERT INTO info(uid, cid, rating, grade, content) VALUES (" + req.body.uid + ", "+ req.body.cid + ", "
-        + data.rating + ", '" + data.grade + "', '" + data.content +"')"
+        + data.rating + ", '" + data.grade + "', '" + data.content +"')" 
         console.log(query_str)
         sql_con.query(query_str, function(err, results) {
             if (err) {
@@ -85,7 +92,7 @@ app.post("/serverlet", function(req, res) {
                 })
                 res.end()
             } else {
-                obj.commentlist = results
+                res.send({result:1})
             }
         });
     } else if (req.body.action === 'signin') {
@@ -117,8 +124,9 @@ app.post("/serverlet", function(req, res) {
                 });
             }
         }); 
+        sql_con.commit()
     } else if (req.body.action === 'request-page') {
-        var query_str = "SELECT * FROM info WHERE cid = " + req.body.cid;
+        var query_str = "SELECT * FROM info NATURAL JOIN User WHERE cid = " + req.body.cid;
         var obj = {}
         console.log(query_str)
         sql_con.query(query_str, function(err, results) {
@@ -130,7 +138,7 @@ app.post("/serverlet", function(req, res) {
                 return
             } else {
                 obj.commentlist = results
-                query_str = "SELECT * FROM Assignments WHERE cid = " + req.body.cid;
+                query_str = "SELECT * FROM Assignment NATURAL JOIN User WHERE cid = " + req.body.cid;
                 sql_con.query(query_str, function(err, results) {
                     if (err) {
                         console.log(err)
@@ -138,13 +146,27 @@ app.post("/serverlet", function(req, res) {
                             message : "database error!"
                         })
                         return
-                        
                     } else {
                         obj.asmtlist = results
+                        query_str = "SELECT * FROM Course WHERE cid = " + req.body.cid;
+                        sql_con.query(query_str, function(err, results) {
+                            if (err) {
+                                console.log(err)
+                                res.send({result : 0,
+                                    message : "database error!"
+                                })
+                                return
+                            } else {
+                                obj.result = 1
+                                obj.course_info = results[0]
+                                console.log(obj)
+                                res.send(obj)
+                            }
+                        })
+                        
                     }
                 });
-                obj.result = 1
-                res.send(obj)
+                
             }
         });
     } else if (req.body.action === 'post-asmt') {
@@ -153,8 +175,8 @@ app.post("/serverlet", function(req, res) {
         data = '{"' + data + '"}'
         console.log(data)
         data = JSON.parse(data)
-        var query_str = "INSERT INTO Assignments(uid, cid, type, grading, workload, comment) VALUES (" + req.body.uid + ", "+ req.body.cid + ", "
-        + data.type + ", '" + data.rating + "', '" + data.workload + "', '" + data.comment + "')"
+        var query_str = "INSERT INTO Assignment(uid, cid, type, grading, workload, comment) VALUES (" + req.body.uid + ", "+ req.body.cid + ", '"
+        + data.type + "', '" + data.grading + "', '" + data.workload + "', '" + data.content + "')"
         console.log(query_str)
         sql_con.query(query_str, function(err, results) {
             if (err) {
@@ -164,9 +186,78 @@ app.post("/serverlet", function(req, res) {
                 })
                 res.end()
             } else {
-                obj.commentlist = results
+                res.send({result : 1})
             }
         });
+        sql_con.commit()
+    } else if (req.body.action === 'del_asmt') {
+        var query_str = "DELETE FROM Assignment WHERE cid = " +req.body.cid +" AND uid = " + req.body.uid;
+        console.log(query_str)
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                res.send({result : 0})
+            } else {
+                res.send({result : 1})
+            }
+        });
+        sql_con.commit()
+    } else if (req.body.action === 'del_cmt') {
+        var query_str = "DELETE FROM info WHERE cid = " +req.body.cid +" AND uid = " + req.body.uid;
+        console.log(query_str)
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                res.send({result : 0})
+            } else {
+                res.send({result : 1})
+            }
+        });
+        sql_con.commit()
+    } else if (req.body.action === 'fetch_user') {
+        var query_str = "SELECT * FROM Assignment WHERE uid=" + req.body.uid
+        console.log(query_str)
+        var obj = {}
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                res.send({result : 0})
+                console.log(err)
+                return
+            } else {
+                obj.asmt_list = results
+                query_str = "SELECT * FROM info WHERE uid=" + req.body.uid
+                sql_con.query(query_str, function(err, results) {
+                    if (err) {
+                        res.send({result : 0})
+                        return
+                    } else {
+                        obj.comment_list = results
+                        console.log(obj)
+                        res.send(obj)
+                    }
+                })
+            }
+        })
+    } else if (req.body.action === 'remove_acc') {
+        var query_str = "DELETE FROM User WHERE uid = " + req.body.uid
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                res.send({result : 0})
+                return
+            } else {
+                res.send({result : 1})
+            }
+        })
+        sql_con.commit()
+    } else if (req.body.action === 'fetch_board') {
+        var query_str = "SELECT * FROM Instructor ORDER BY rating LIMIT 100"
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                console.log(err)
+                res.send({result : 0})
+                return
+            } else {
+                res.send({result : 1, board : results})
+            }
+        })
     }
 })
 

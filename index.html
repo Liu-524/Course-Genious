@@ -24,8 +24,9 @@
         </div>
         <div class="navbar-collapse collapse" id='nvb-clpse-1'>
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#main">Course</a></li>
-                <li><a href="#user">User</a></li>
+                <li class="active"><a href="#main" data-toggle="tab">Course</a></li>
+                <li><a href="#user" data-toggle="tab">User</a></li>
+                <li><a href="#leaderboard" data-toggle="tab" onclick="fetch_board()">Instructor Leaderboard</a></li>
             </ul>
             <form v-if='user===""' class="navbar-form navbar-right" onsubmit="return false">
                 <div class="form-group" id='login_form'>
@@ -42,6 +43,8 @@
         </div>
     </div>
     </nav>
+    <div id="mainTabs" class="tab-content">
+    <div class="tab-pane fade in active" id="main">
     <div class='container-fluid'>
         <div class='row'>
             <div class='col-lg-2'>
@@ -53,7 +56,7 @@
                 </form></div>
                 <div class='row'>
                     <ul class='nav nav-list pre-scrollable'>
-                        <li v-for='course in course_list' :key='course.cid' :id='forId(course.cid)'>
+                        <li v-for='course in course_list' :key='course.cid' :id='forId(course.cid)' onclick="course_switch()">
                         {{course.abbr}}{{course.course_num}}
                         </li>
                     </ul>
@@ -88,7 +91,7 @@
                                     <h4>Contributed by {{asmt.uname}},</h4>
                                     <p> type: {{asmt.type}}</p> 
                                     <p :class='asmtGetClass(asmt.grading)'> grading: {{asmt.grading}}</p>
-                                    <p :class='asmtGetClass(asmt.load)'> workload: {{asmt.load}}</p>
+                                    <p :class='asmtGetClass(asmt.workload)'> workload: {{asmt.workload}}</p>
                                     <p class='text-justify'>{{asmt.content}}</p>
                                 <li>
                                 </ul>
@@ -104,7 +107,7 @@
                                     <div class='form-group'><input name='grade' type='text' required="required" id='write-grade'></div>
                                     <label for='write-content'>Comment</label>
                                     <div class='form-group'><input class='form-control' name='content' type='text' required="required" id='write-content'></div>
-                                    <div class='form-group'><input type='submit' class='btn-primary' value='submit'></div>
+                                    <div class='form-group'><input type='submit' class='btn btn-primary' value='submit'></div>
                                 </form>
                             </div>
                             <div class='row'>
@@ -120,8 +123,8 @@
                                     </div>
                                     <label for='asmtfrom-grading'>Grading</label>
                                     <div class='form-group'>
-                                        <label class='radio-inline'><input name='grade' type='radio' required="required" value='single'>single attempt</label>
-                                        <label class='radio-inline'><input name='grade' type='radio' required="required" value='multi'>multiple attempts</label>
+                                        <label class='radio-inline'><input name='grading' type='radio' required="required" value='single'>single attempt</label>
+                                        <label class='radio-inline'><input name='grading' type='radio' required="required" value='multi'>multiple attempts</label>
                                     </div>
                                     <label for='asmtform-workload'>Workload</label>
                                     <div class='form-group'>
@@ -131,7 +134,7 @@
                                     </div>
                                     <label for='asmtform-content'>Comment</label>
                                     <div class='form-group'><input class='form-control' name='content' type='text' required="required" id='write-content'></div>
-                                    <div class='form-group'><input type='submit' class='btn-primary' value='submit'></div>
+                                    <div class='form-group'><input type='submit' class='btn btn-primary' value='submit'></div>
                                 </form>
                             </div>
                         </div>
@@ -141,6 +144,73 @@
             </div>
             </div>
         </div>
+    </div>
+    </div>
+    <div class="tab-pane fade" id="user">
+        <div class='container-fluid' v-if='user===""'>
+            <h3>Login first!</h3>
+        </div>
+        <div class='container-fluid' v-else>
+            <div class="row">
+                <div class='col-lg-10'>
+                <h4>Hello! {{user}}</h4>
+                <button class='btn btn-default' onclick="fetch_user_data()">Fetch</button>
+                </div>
+                <div class="col-lg-2">
+                    <button class='btn btn-danger' onclick="removeAcc()">Remove Account</button>
+                </div>
+
+            </div>
+            <div class='row'>
+                <h4>My Comments</h4>
+                <ul class='list-unstyled pre-scrollable' id='comment-view'>
+                    <li v-for='comment in user_data.comment_list'>
+                        <p class='text-justify'>{{comment.content}}</p>
+                        <button class='btn btn-danger' :id='del_cmt(comment.cid)' onclick="cmtd_fun()">Delete</button>
+                    </li>
+                </ul>
+            </div>
+            <div class='row'>
+                <h4>My Assignment Posts</h4>
+                <ul class='list-unstyled pre-scrollable' id='assignment-view'>
+                    <li v-for='asmt in user_data.asmt_list'>
+                        <p class='text-justify'>{{asmt.content}}</p>
+                        <button class='btn btn-danger':id='del_asmt(asmt.cid)' onclick="asmtd_fun()">Delete</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="leaderboard">
+        <div class='container-fluid'>
+            <div class='row'>
+                <div class='col-lg-2'></div>
+                <div class='col-lg-8'>
+                    <div class='table-responsive'>
+                    <table class='table-striped' style="width: 100%; height: auto;">
+                        <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Score</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for='(prof, index) in prof_list'>
+                            <th>{{index + 1}}</th>
+                            <th>{{prof.fname}}</th>
+                            <th>{{prof.lname}}</th>
+                            <th>{{prof.rating}}</th>
+                        </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+        </div>
+    </div>
     </div>
 </div>
 </body>
@@ -176,11 +246,16 @@
                             {uname:'Stu233', type: 'multi-weekly', grading:'single', load: 'medium', content : "3 infinite try coding homework and 3 single try written homework."},
                             {uname:'>_<', type: 'part-of-semester', grading:'single', load: 'medium', content : "2 exams with one page cheatsheet."},
                             {uname:'Agent Smith', type: 'semester-long', grading:'single', load: 'heavy', content : 'semester long group project which takes lots of time..'},
-
             ],
         },
         user : "",
-        uid : -1
+        uid : -1,
+        user_data : {
+            comment_list : [{cid : 0, rating : 0, content : "aha"}],
+            asmt_list : [{cid: 0, content : "many many work"}]
+        },
+        prof_list : undefined,
+        removeAlert : 1
     },
     methods : {
         forId(x) {
@@ -192,10 +267,28 @@
             if (s === 'light') return 'text-success'
             if (s === 'medium') return 'text-primary'
             if (s === 'heavy') return 'text-danger'
+        },
+        del_cmt(x) {
+            return x + ";cmtd"
+        },
+        del_asmt(x) {
+            return x + ";asmtd"
         }
     }
     });
-
+    function fetch_board() {
+        if ((vue.prof_list == undefined) || (vue.prof_list == [])) {
+            axios.post(url+"/serverlet", {
+                action : "fetch_board"
+            }).then(function(res){
+                if (res.data.result == 1) {
+                    vue.prof_list = res.data.board
+                } else {
+                    alert("failed")
+                }
+            })
+        }
+    }
     function signin() {
         var uemail = $('#user_email').val()
         var upwd = $('#user_pwd').val()
@@ -215,8 +308,24 @@
         }).catch(function(err){
             console.log(err);
         })
+    };
+    function removeAcc() {
+        if (vue.removeAlert == 0) {
+            axios.post(url+"/serverlet", {
+                action : "remove_acc",
+                uid : vue.uid
+            }).then(function(res){
+                if (res.data.result == 1) {
+                    window.location.href = url + "/index"
+                } else {
+                    alert("failed")
+                }
+            })
+        } else {
+            vue.removeAlert = 0
+            alert("Remove account will remove all relevent record permanently!")   
+        }
     }
-
     function login() {
         var uemail = $('#user_email').val()
         var upwd = $('#user_pwd').val()
@@ -242,19 +351,28 @@
         var url = this.window.document.location.origin;
         var integer = $('#find_course').val().match(/\d+/g);
         var abbr =  $('#find_course').val().match(/[a-zA-Z]+/g);
+        var tempCmd;
+        alert("damn")
         if (integer < 100 && integer > 10) {
-            maxint = parseInt(integer, 10);
+            var maxint = parseInt(integer, 10);
             maxint = (maxint + 1) * 10
             integer = integer * 10;
-            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and course_num < ' + maxint  + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+            if (isNaN(maxint)) {
+                maxint = 900
+            }
+            tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and course_num < ' + maxint  + ' and abbr LIKE \'' + abbr  + '%\'' 
         } else if (integer < 10 && integer >= 0) {
-            maxint = parseInt(integer, 10);
+            var maxint = parseInt(integer, 10);
             maxint = (maxint + 1) * 100
             integer = integer * 100
-            var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and course_num < ' + maxint + ' and abbr = \'' + abbr  + '\'' + ' LIMIT 6'
+            if (isNaN(maxint)) {
+                maxint = 900
+            }
+            tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num >= ' + integer + ' and course_num < ' + maxint + ' and abbr LIKE \'' + abbr  + '%\''
         } else {
-        var tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr = \'' + abbr  + '\''
+            tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr LIKE \'' + abbr  + '%\''
         }
+        alert(tempCmd)
         axios.post(url + '/searchres', {
             command : tempCmd
         }).then(function(res) { //success
@@ -301,10 +419,51 @@
             console.log(err);
         })
     });
-    $('tr').click(function() {
-        alert(event.srcElement.id);
-    });
-    $('[id$="course_page"]').click(function() {
+    function asmtd_fun() {
+        var cid = event.srcElement.id;
+        cid = cid.split(";")[0]
+        axios.post(url+"/serverlet", {
+            action : "del_asmt",
+            cid : cid,
+            uid : vue.uid
+        }).then(function(res){
+            if (res.result == 0) {
+                alert("error")
+            } else {
+                fetch_user_data()
+            }
+        }).catch(function(err){
+            console.log(err)
+        })
+    };
+    function cmtd_fun() {
+        var cid = event.srcElement.id;
+        cid = cid.split(";")[0]
+        axios.post(url+"/serverlet", {
+            action : "del_cmt",
+            cid : cid,
+            uid : vue.uid
+        }).then(function(res){
+            if (res.result == 0) {
+                alert("error")
+            } else {
+                fetch_user_data()
+            }
+        }).catch(function(err){
+            console.log(err)
+        })
+    };
+    function fetch_user_data() {
+        axios.post(url + "/serverlet", {
+            action : "fetch_user",
+            uid : vue.uid
+        }).then(function(res) {
+            vue.user_data = res.data
+        }).catch(function(err){
+            console.log(err)
+        })
+    }
+    function course_switch() {
         var id = event.srcElement.id;
         var cid = id.split(";")[0]
         axios.post(url + "/serverlet", {
@@ -312,8 +471,9 @@
             cid : cid
         }).then(function(res) {
             if (res.data.result == 1) {
-                vue.featured = res.data.commentlist
-                vue.assignments = res.data.asmtlist
+                vue.course_data = res.data.course_info
+                vue.course_data.featured = res.data.commentlist
+                vue.course_data.assignments = res.data.asmtlist
             } else {
                 alert("db error!")
             }
@@ -321,5 +481,5 @@
             console.log(err)
         });
         alert(id);
-    })
+    }
 </script>
