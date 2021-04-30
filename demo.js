@@ -12,11 +12,10 @@ app.use(bodyParser.json());
 var sql = require("mysql");
 //const { RESERVED_EVENTS } = require('socket.io/dist/socket');
 var sql_con = sql.createConnection({
-    user: 'root',
-    password: "123456",
-    host: "localhost",
-    database : "s3",
-    port : 3306
+    user: 'dev',
+    password: "411-t7",
+    host: "35.221.70.238",
+    database : "cs411-db",
 });
 sql_con.connect();
 
