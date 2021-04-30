@@ -371,7 +371,7 @@
         } else {
             tempCmd = 'SELECT cid, course_num, abbr FROM Course Where course_num = ' + integer + ' and abbr LIKE \'' + abbr  + '%\''
         }
-        alert(tempCmd)
+        //alert(tempCmd)
         axios.post(url + '/searchres', {
             command : tempCmd
         }).then(function(res) { //success
@@ -384,7 +384,7 @@
 
     $("#write-comment").submit(function() {
         var data = $('#write-comment').serialize()
-        alert(data);
+        //alert(data);
         axios.post(url + '/serverlet', {
             action : "post-comment",
             data : data,
@@ -402,7 +402,7 @@
     });
     $("#write-assignment").submit(function() {
         var data = $('#write-assignment').serialize()
-        alert(data);
+        //alert(data);
         axios.post(url + '/serverlet', {
             action : "post-asmt",
             data : data,
@@ -479,6 +479,6 @@
         }).catch(function(err) {
             console.log(err)
         });
-        alert(id);
+        //alert(id);
     }
 </script>
