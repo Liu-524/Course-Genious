@@ -1,11 +1,7 @@
-//express_demo.js 文件
-
-
 var express = require('express');
 var app = express();
 
 var http = require('http');
-	// 声明文件操作系统对象
 var fs = require('fs');
 
 var mysql = require('mysql');
@@ -23,9 +19,7 @@ var connection = mysql.createConnection({
 app.get('/search/', function (req, res) {
     //res.send('Hello World33');
         res.sendFile('/Users/lucas/OneDrive/UIUC/CS 411/cs411-t7/index.html');
-       
-
- })
+})
 
 app.post('/search/', function (req, res) {
     res.send()

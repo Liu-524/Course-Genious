@@ -15,7 +15,7 @@
 - HTML/CSS/JavaScript/Bootstrap/Vue for the frontend
 - Node.js/MySQL for the backend
 
-### Team Members
+## Team Members
 - Bohan Liu
 - Yipeng Yang
 - Yuhan Lu
