@@ -45,6 +45,18 @@ app.post("/database",function(req, res) {
     });
 });
 
+app.get("/secret", function(req, res) {
+    var query_string = "CALL advancedP()"
+    sql_con.query(query_string, function(err, result) {
+        if (err) {
+            console.log(err);
+            res.send(err);
+        }
+        console.log(result);
+        res.send("OK");
+    });
+});
+
 app.post("/serverlet", function(req, res) {
     console.log(req.body);
     if (req.body.action === 'login') {
@@ -248,7 +260,7 @@ app.post("/serverlet", function(req, res) {
         })
         sql_con.commit()
     } else if (req.body.action === 'fetch_board') {
-        var query_str = "SELECT * FROM Instructor ORDER BY rating LIMIT 100"
+        var query_str = "SELECT DISTINCT lname, fname, rating FROM Instructor ORDER BY rating DESC LIMIT 100"
         sql_con.query(query_str, function(err, results) {
             if (err) {
                 console.log(err)

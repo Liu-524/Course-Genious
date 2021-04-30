@@ -92,7 +92,7 @@
                                     <p> type: {{asmt.type}}</p> 
                                     <p :class='asmtGetClass(asmt.grading)'> grading: {{asmt.grading}}</p>
                                     <p :class='asmtGetClass(asmt.workload)'> workload: {{asmt.workload}}</p>
-                                    <p class='text-justify'>{{asmt.content}}</p>
+                                    <p class='text-justify'>{{asmt.comment}}</p>
                                 <li>
                                 </ul>
                         </div>
@@ -174,7 +174,7 @@
                 <h4>My Assignment Posts</h4>
                 <ul class='list-unstyled pre-scrollable' id='assignment-view'>
                     <li v-for='asmt in user_data.asmt_list'>
-                        <p class='text-justify'>{{asmt.content}}</p>
+                        <p class='text-justify'>{{asmt.comment}}</p>
                         <button class='btn btn-danger':id='del_asmt(asmt.cid)' onclick="asmtd_fun()">Delete</button>
                     </li>
                 </ul>
