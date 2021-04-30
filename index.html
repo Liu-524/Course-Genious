@@ -109,7 +109,7 @@
                             </div>
                             <div class='row'>
                                 <h4>Describe an assignment</h4>
-                                <form id='write-assignment' onsubmit="false">
+                                <form id='write-assignment' onsubmit="return false">
                                     <label for='asmtfrom-type'>Type</label>
                                     <div class='form-group'>
                                         <label class='radio-inline'><input name='type' type='radio' required="required" value='daily'>daily</label>
@@ -266,13 +266,19 @@
     }
 
     $("#write-comment").submit(function() {
-        var data = JSON.stringify($('#write-comment').serializeArray())
+        var data = $('#write-comment').serialize()
         alert(data);
         axios.post(url + '/serverlet', {
             action : "post-comment",
-            data : data
+            data : data,
+            cid : vue.course_data.cid,
+            uid : vue.uid
         }).then(function(res) {
-            console.log(res)
+            if (res.data.result == 1) {
+                alert("success!")
+            } else {
+                alert("failed!")
+            }
         }).catch(function(err){
             console.log(err);
         })
@@ -280,13 +286,40 @@
     $("#write-assignment").submit(function() {
         var data = $('#write-assignment').serialize()
         alert(data);
-        this.window.location = url
+        axios.post(url + '/serverlet', {
+            action : "post-asmt",
+            data : data,
+            cid : vue.course_data.cid,
+            uid : vue.uid
+        }).then(function(res) {
+            if (res.data.result == 1) {
+                alert("success!")
+            } else {
+                alert("failed!")
+            }
+        }).catch(function(err){
+            console.log(err);
+        })
     });
     $('tr').click(function() {
         alert(event.srcElement.id);
     });
     $('[id$="course_page"]').click(function() {
         var id = event.srcElement.id;
+        var cid = id.split(";")[0]
+        axios.post(url + "/serverlet", {
+            action : "request-page",
+            cid : cid
+        }).then(function(res) {
+            if (res.data.result == 1) {
+                vue.featured = res.data.commentlist
+                vue.assignments = res.data.asmtlist
+            } else {
+                alert("db error!")
+            }
+        }).catch(function(err) {
+            console.log(err)
+        });
         alert(id);
     })
 </script>

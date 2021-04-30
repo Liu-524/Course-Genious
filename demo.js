@@ -71,15 +71,31 @@ app.post("/serverlet", function(req, res) {
     } else if (req.body.action === 'post-comment') {
         var data = req.body.data.replace(new RegExp('&',"gm"),'", "')
         data = data.replace(new RegExp('=',"gm"), '":"')
-        data = '{"' + data + '"}'
+        data = '{' + data + '}'
+        console.log(data)
         data = JSON.parse(data)
-        console.log(data.rating == 1)
-        res.send("OK")
+        var query_str = "INSERT INTO info(uid, cid, rating, grade, content) VALUES (" + req.body.uid + ", "+ req.body.cid + ", "
+        + data.rating + ", '" + data.grade + "', '" + data.content +"')"
+        console.log(query_str)
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                console.log(err)
+                res.send({result : 0,
+                    message : "database error!"
+                })
+                res.end()
+            } else {
+                obj.commentlist = results
+            }
+        });
     } else if (req.body.action === 'signin') {
         var colli = false
         var query_str = "SELECT * FROM User WHERE email = '" + req.body.username + "' LIMIT 1"
         sql_con.query(query_str, function (error, results, fields) {
-            if (error) throw error;
+            if (error) {
+                res.send({result:0})
+                res.end()
+            }
             console.log('The solution is: ' + results.length);
             if (results.length == 1) {
                 res.send({result : 0})
@@ -100,9 +116,57 @@ app.post("/serverlet", function(req, res) {
                     }
                 });
             }
+        }); 
+    } else if (req.body.action === 'request-page') {
+        var query_str = "SELECT * FROM info WHERE cid = " + req.body.cid;
+        var obj = {}
+        console.log(query_str)
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                console.log(err)
+                res.send({result : 0,
+                    message : "database error!"
+                })
+                return
+            } else {
+                obj.commentlist = results
+                query_str = "SELECT * FROM Assignments WHERE cid = " + req.body.cid;
+                sql_con.query(query_str, function(err, results) {
+                    if (err) {
+                        console.log(err)
+                        res.send({result : 0,
+                            message : "database error!"
+                        })
+                        return
+                        
+                    } else {
+                        obj.asmtlist = results
+                    }
+                });
+                obj.result = 1
+                res.send(obj)
+            }
         });
-            
-        
+    } else if (req.body.action === 'post-asmt') {
+        var data = req.body.data.replace(new RegExp('&',"gm"),'", "')
+        data = data.replace(new RegExp('=',"gm"), '":"')
+        data = '{"' + data + '"}'
+        console.log(data)
+        data = JSON.parse(data)
+        var query_str = "INSERT INTO Assignments(uid, cid, type, grading, workload, comment) VALUES (" + req.body.uid + ", "+ req.body.cid + ", "
+        + data.type + ", '" + data.rating + "', '" + data.workload + "', '" + data.comment + "')"
+        console.log(query_str)
+        sql_con.query(query_str, function(err, results) {
+            if (err) {
+                console.log(err)
+                res.send({result : 0,
+                    message : "database error!"
+                })
+                res.end()
+            } else {
+                obj.commentlist = results
+            }
+        });
     }
 })
 
