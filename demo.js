@@ -15,7 +15,7 @@ var sql_con = sql.createConnection({
     user: 'dev',
     password: "411-t7",
     host: "35.221.70.238",
-    database : "cs411-db",
+    database : "cs411db",
 });
 sql_con.connect();
 
