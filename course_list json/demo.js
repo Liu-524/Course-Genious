@@ -1,9 +1,7 @@
 var express = require('express');
 var app = express();
-
 var http = require('http');
 var fs = require('fs');
-
 var mysql = require('mysql');
 var bodyParser = require('body-parser');
 const { response } = require('express');
