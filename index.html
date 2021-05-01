@@ -66,7 +66,8 @@
                 <div class="container-fluid">
                 <div class='row'>
                     <h2>{{course_data.abbr}}{{course_data.course_num}}</h2>
-                    <h4>Average Rating: {{course_data.avg_rating}}</h4>
+                    <h4 :class='colorRating(course_data.avg_rating)'>Average Rating: {{course_data.avg_rating}}</h4>
+                    <h4>Instructor: {{course_data.ins_name}}</h4>
                     <p class='text-justify'>{{course_data.description}}</p>
                 </div>
                 <div class='row'>
@@ -258,6 +259,16 @@
         removeAlert : 1
     },
     methods : {
+        colorRating(x) {
+            if (x >3.5) {
+                return "text-success"
+            } else if (x > 2) {
+                return "text-primary"
+            } else {
+                return "text-danger"
+            }
+        }
+        ,
         forId(x) {
             return x + ";course_page";
         },
