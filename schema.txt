@@ -1,0 +1,57 @@
+create table User(
+    uid int primary key auto_increment,
+    email varchar(30),
+    pwd varchar(30),
+    uname varchar(127)
+);
+
+create table Course(
+    cid int primary key auto_increment,
+    abbr varchar(10) not null,
+    course_num int not null,
+    name varchar(127),
+    description varchar(1024),
+    ins_name varchar(127),
+    avg_rating int,
+    cnt int
+);
+
+insert into Assignment(uid,cid,type,grading,workload,comment) values(1,1,"weekly","multi","light","Weekly prelectures and group assesments!");
+
+insert into Assignment(uid,cid,type,grading,workload,comment) values(2,2,"biweekly","single","heavy","3 infinite try coding homework and 3 single try written homework.");
+
+
+create table Assignment(
+    uid int,
+    cid int,
+    type varchar(127),
+    grading varchar(127),
+    workload varchar(127),
+    comment varchar(127),
+    primary key(uid, cid),
+    foreign key(uid) references User(uid),
+    foreign key(cid) references Course(cid)
+);
+
+create table Instructor(
+    iid int primary key auto_increment,
+    dept varchar(127),
+    lname varchar(20),
+    fname varchar(1),
+    rating float
+);
+
+insert into info(uid,cid,rating,grade,content) values(1,1,5,"B-","This course is not cool!");
+
+insert into info(uid,cid,rating,grade,content) values(4,4,1,"F","I hate the instructor!");
+
+create table info(
+    uid int,
+    cid int,
+    rating int,
+    grade varchar(3),
+    content varchar(1024),
+    primary key(uid, cid),
+    foreign key(uid) references User(uid),
+    foreign key(cid) references Course(cid)
+);
